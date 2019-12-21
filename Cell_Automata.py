@@ -5,12 +5,11 @@ import random
 import math
 
 size = 500
+rule = 23976
 
-rule = 110
-# please only input odds. I don't know if/how evens work.
-
-input_size = 3
-number_of_colors = 2
+# please only input odds. Evens don't work how I want them to yet
+input_size = 5
+number_of_colors = 3
 
 # turns the rules
 size = ((input_size//2+1)*size+2, size+1)
@@ -24,10 +23,8 @@ def convert_to_base(n, base):
         nums.append(str(r))
     return ''.join(nums)[::-1].zfill(number_of_colors**input_size+number_of_colors)[::-1]
 
-rule_in_base = convert_to_base(rule, number_of_colors)
-print(rule_in_base)
-#rule_bin = list(format(rule, f'#0{2**input_size+2}b')[2:])
-rule_formatted = list(rule_in_base)
+rule_in_base = list(convert_to_base(rule, number_of_colors))
+
 # Produces all n-ary digits that are `input_size` in length in order...
 # ...into a list like so: `['000', '001', '010', '011', ...]`
 numbers = ''.join([str(x) for x in range(number_of_colors)])
@@ -35,7 +32,6 @@ keys = list(map(''.join, itertools.product(numbers, repeat=input_size)))
 
 # Maps the keys produced to the digits of `rule_binary`
 rule_rules = dict(zip(keys, rule_formatted))
-print(rule_rules)
 
 width, height = size
 cells = [['0' for _ in range(width)] for _ in range(height)]
