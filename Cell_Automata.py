@@ -2,7 +2,6 @@ from PIL import Image
 import PIL
 import itertools
 import random
-import math
 
 size = 500
 
