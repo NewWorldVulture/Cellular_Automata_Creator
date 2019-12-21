@@ -23,7 +23,7 @@ def convert_to_base(n, base):
         nums.append(str(r))
     return ''.join(nums)[::-1].zfill(number_of_colors**input_size+number_of_colors)[::-1]
 
-rule_in_base = list(convert_to_base(rule, number_of_colors))
+rule_formatted = list(convert_to_base(rule, number_of_colors))
 
 # Produces all n-ary digits that are `input_size` in length in order...
 # ...into a list like so: `['000', '001', '010', '011', ...]`
