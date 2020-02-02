@@ -5,12 +5,13 @@ import random
 
 class CellularAutomata():
     def __init__(self, rule_number, image_size=500, automata_input_bits=3, number_of_colors=2,
-                    random_first_row=False):
+                    random_first_row=False, verbose=False):
         # Highest rule number for a set of settings.
         self.maximum_rule_number = rule_number ** (automata_input_bits ** number_of_colors)
         self.automata_input_bits = automata_input_bits
         self.number_of_colors = number_of_colors
         self.random_first_row = random_first_row
+        self.verbose = verbose
         # Proportion the image based on number of bits in `input_size`
         # e.g. for `input_size` 3, make the pic 2:1. For `input_size` 5, it's 4:1
         self.image_size = ((automata_input_bits//2+1)*image_size+2, image_size+1)
@@ -24,19 +25,28 @@ class CellularAutomata():
     # Anything above that just uses unnecessary computer cycles, as they're...
     # ... equivalent to `rule_number % maximum_rule_number`
     def convert_rule_to_base(self, rule_number):
+        if self.verbose:
+            print(f"Rule number input: {rule_number}")
         if rule_number == 0:
-            return ['0'] * (self.number_of_colors**self.automata_input_bits+self.number_of_colors)
+            # Don't remember the justification for this, but it's theoretically...
+            # ... the number of digits in the maximum_rule_number
+            return ''.join(['0'] * (self.number_of_colors**self.automata_input_bits+self.number_of_colors))
         if rule_number > self.maximum_rule_number:
             rule_number = rule_number % self.maximum_rule_number
-        nums = []
+            if self.verbose:
+                print(f"Maximum rule number is {self.maximum_rule_number}.\nConverting rule to proper base.")
+                print(f"Smallest equivalent rule:\n{rule_number}")
+
+        new_rule_number_digits = []
         # Generate each digit of the new rule number in base
         while rule_number:
             rule_number, remainder = divmod(rule_number, self.number_of_colors)
-            nums.append(str(remainder))
-            # Complicated. Rule numbers in Cellular Automata are defined by
-        new_rule_number = ''.join(nums)[::-1].zfill(self.number_of_colors**self.automata_input_bits+self.number_of_colors)[::-1]
+            new_rule_number_digits.append(str(remainder))
+            # Complicated. Rule numbers in Cellular Automata are defined by the following
+        new_rule_number = ''.join(new_rule_number_digits)[::-1].zfill(self.number_of_colors**self.automata_input_bits+self.number_of_colors)[::-1]
         return new_rule_number
 
+    # Returns a dictionary of possible inputs to the digits of
     def create_rule_dictionary(self):
         # list of numbers less than `number_of_colors`. Joined as a String. e.g. `012`
         numbers_in_base = ''.join([str(integer) for integer in range(self.number_of_colors)])
@@ -65,7 +75,8 @@ class CellularAutomata():
         if self.random_first_row:
             self.cellular_automata[0] = [random.choice([str(val) for val in range(self.number_of_colors)]) for _ in range(self.ca_width)]
         else:
-            # Mark the center pixel as '1' (white) if we don't have a randomly assigned first row
+            # Mark the center pixel as '1' (white) if we don't have a randomly assigned first row.
+            # If `image_size` is even, it will be on the right-hand center pixel
             self.cellular_automata[0][int(self.ca_width//2)+1] = '1'
 
         # The fun stuff. For each cell in each row, decide what the value should be
@@ -80,11 +91,12 @@ class CellularAutomata():
 
         im = Image.new("RGB", self.image_size, "#000000")
         cellular_automata_image = im.load()
-        for image_row in range(self.ca_height-1):
+        # Create image row by row
+        for image_row in range(self.ca_height):
             for row_cell in range(self.ca_width-self.automata_input_bits//2-1):
-                cell_value = self.cellular_automata[image_row+1][row_cell+1]
+                cell_value = self.cellular_automata[image_row][row_cell+1]
                 color = self.colors[int(cell_value)]
-                cellular_automata_image[row_cell, image_row+1] = color
+                cellular_automata_image[row_cell, image_row] = color
         im.save(f"rule{self.rule_number}_{self.automata_input_bits}_bit.png")
         im.show()
 
