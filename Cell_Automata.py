@@ -7,7 +7,7 @@ class CellularAutomata():
     def __init__(self, rule_number, image_size=500, automata_input_bits=3, number_of_colors=2,
                     random_first_row=False, verbose=False):
         # Highest rule number for a set of settings.
-        self.maximum_rule_number = rule_number ** (automata_input_bits ** number_of_colors)
+        self.maximum_rule_number = number_of_colors ** (automata_input_bits ** number_of_colors)
         self.automata_input_bits = automata_input_bits
         self.number_of_colors = number_of_colors
         self.random_first_row = random_first_row
@@ -102,7 +102,7 @@ class CellularAutomata():
 
 
 def main():
-    new_automata = CellularAutomata(110)
+    new_automata = CellularAutomata(6881362, 500, 5, 2, False, True)
     new_automata.create_automata_image()
 
 if __name__ == '__main__':
